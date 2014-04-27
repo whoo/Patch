@@ -1,6 +1,5 @@
-diff -rupN src.orig/command.c src/command.c
---- src.orig/command.c	2014-03-16 09:17:14.461433244 -0400
-+++ src/command.c	2014-03-16 09:17:46.525430116 -0400
+--- src/command.c.orig	2014-04-27 08:45:59.191631943 -0400
++++ src/command.c	2014-04-27 08:53:19.024343695 -0400
 @@ -72,6 +72,7 @@
  #include <time.h>
  #include <stdlib.h>
@@ -9,10 +8,28 @@ diff -rupN src.orig/command.c src/command.c
  
  #define COMMAND_STATUS_STATE            "state"
  #define COMMAND_STATUS_REPEAT           "repeat"
-@@ -325,6 +326,24 @@ handle_pause(struct client *client,
- 	return COMMAND_RETURN_OK;
+@@ -326,6 +327,43 @@
  }
  
+ static enum command_return
++handle_pulseoff(struct client *client,
++              G_GNUC_UNUSED int argc, G_GNUC_UNUSED char *argv[])
++{
++client_printf(client,"Stop Pulse\n");
++system("pacmd unload-module module-rtp-send");
++return COMMAND_RETURN_OK;
++}
++
++
++static enum command_return
++handle_pulseon(struct client *client,
++              G_GNUC_UNUSED int argc, G_GNUC_UNUSED char *argv[])
++{
++client_printf(client,"Start Pulse\n");
++system("pacmd load-module module-rtp-send source=rtp.monitor mtu=16000 loop=1 rate=44100 port=5555 ttl=2 channels=2");
++return COMMAND_RETURN_OK;
++}
++
 +
 +static enum command_return 
 +handle_pulsesync(struct client *client,
@@ -31,14 +48,17 @@ diff -rupN src.orig/command.c src/command.c
 +}
 +
 +
- static enum command_return
++static enum command_return
  handle_status(struct client *client,
  	      G_GNUC_UNUSED int argc, G_GNUC_UNUSED char *argv[])
-@@ -2046,6 +2065,7 @@ static const struct command commands[] =
+ {
+@@ -2046,6 +2084,9 @@
  	{ "previous", PERMISSION_CONTROL, 0, 0, handle_previous },
  	{ "prio", PERMISSION_CONTROL, 2, -1, handle_prio },
  	{ "prioid", PERMISSION_CONTROL, 2, -1, handle_prioid },
-+	{ "pulsesync", PERMISSION_READ, 0, 0, handle_pulsesync },
++	{ "pulseoff", PERMISSION_CONTROL, 0, 0, handle_pulseoff },
++	{ "pulseon", PERMISSION_CONTROL, 0, 0, handle_pulseon },
++	{ "pulsesync", PERMISSION_CONTROL, 0, 0, handle_pulsesync },
  	{ "random", PERMISSION_CONTROL, 1, 1, handle_random },
  	{ "readmessages", PERMISSION_READ, 0, 0, handle_read_messages },
  	{ "rename", PERMISSION_CONTROL, 2, 2, handle_rename },
