@@ -1,5 +1,5 @@
 --- src/command.c.orig	2014-04-27 08:45:59.191631943 -0400
-+++ src/command.c	2014-04-27 08:53:19.024343695 -0400
++++ src/command.c	2014-04-27 08:59:37.594561788 -0400
 @@ -72,6 +72,7 @@
  #include <time.h>
  #include <stdlib.h>
@@ -8,16 +8,16 @@
  
  #define COMMAND_STATUS_STATE            "state"
  #define COMMAND_STATUS_REPEAT           "repeat"
-@@ -326,6 +327,43 @@
+@@ -326,6 +327,39 @@
  }
  
  static enum command_return
 +handle_pulseoff(struct client *client,
 +              G_GNUC_UNUSED int argc, G_GNUC_UNUSED char *argv[])
 +{
-+client_printf(client,"Stop Pulse\n");
-+system("pacmd unload-module module-rtp-send");
-+return COMMAND_RETURN_OK;
++	client_printf(client,"Stop Pulse\n");
++	system("pacmd unload-module module-rtp-send");
++	return COMMAND_RETURN_OK;
 +}
 +
 +
@@ -25,9 +25,9 @@
 +handle_pulseon(struct client *client,
 +              G_GNUC_UNUSED int argc, G_GNUC_UNUSED char *argv[])
 +{
-+client_printf(client,"Start Pulse\n");
-+system("pacmd load-module module-rtp-send source=rtp.monitor mtu=16000 loop=1 rate=44100 port=5555 ttl=2 channels=2");
-+return COMMAND_RETURN_OK;
++	client_printf(client,"Start Pulse\n");
++	system("pacmd load-module module-rtp-send source=rtp.monitor mtu=16000 loop=1 rate=44100 port=5555 ttl=2 channels=2");
++	return COMMAND_RETURN_OK;
 +}
 +
 +
@@ -35,16 +35,12 @@
 +handle_pulsesync(struct client *client,
 +              G_GNUC_UNUSED int argc, G_GNUC_UNUSED char *argv[])
 +{
-+	char *args1[]={"pacmd","unload-module","module-rtp-send",NULL};
-+	char *args2[]={"pacmd","load-module","module-rtp-send","source=rtp.monitor","mtu=16000","loop=1","rate=44100","port=5555","ttl=2","channels=2",NULL};
-+        client_printf(client,"Sync Pulse Audio RTP\n");
-+        client_printf(client,"Sound will stop/start\n");
-+//	execv("/usr/bin/pacmd",args1);
-+//	execv("/usr/bin/pacmd",args2);
++	client_printf(client,"Sync Pulse Audio RTP\n");
++	client_printf(client,"Sound will stop/start\n");
 +	system("pacmd unload-module module-rtp-send");
 +	system("pacmd load-module module-rtp-send source=rtp.monitor mtu=16000 loop=1 rate=44100 port=5555 ttl=2 channels=2");
 +
-+return COMMAND_RETURN_OK;
++	return COMMAND_RETURN_OK;
 +}
 +
 +
@@ -52,7 +48,7 @@
  handle_status(struct client *client,
  	      G_GNUC_UNUSED int argc, G_GNUC_UNUSED char *argv[])
  {
-@@ -2046,6 +2084,9 @@
+@@ -2046,6 +2080,9 @@
  	{ "previous", PERMISSION_CONTROL, 0, 0, handle_previous },
  	{ "prio", PERMISSION_CONTROL, 2, -1, handle_prio },
  	{ "prioid", PERMISSION_CONTROL, 2, -1, handle_prioid },
